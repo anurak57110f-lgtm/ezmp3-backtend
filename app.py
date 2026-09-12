@@ -18,22 +18,28 @@ def download_video():
     temp_dir = tempfile.mkdtemp()
     
     try:
+        ydl_opts = {
+            'outtmpl': os.path.join(temp_dir, '%(title)s.%(ext)s'),
+            'nocheckcertificate': True,
+            'ignoreerrors': False,
+            'no_warnings': True,
+            'extractor_args': {'youtube': {'player_client': ['android', 'web']}},
+        }
+
         if file_format == 'mp3':
-            ydl_opts = {
+            ydl_opts.update({
                 'format': 'bestaudio/best',
-                'outtmpl': os.path.join(temp_dir, '%(title)s.%(ext)s'),
                 'postprocessors': [{
                     'key': 'FFmpegExtractAudio',
                     'preferredcodec': 'mp3',
                     'preferredquality': '192',
                 }],
-            }
+            })
         else:
-            ydl_opts = {
+            ydl_opts.update({
                 'format': 'bestvideo+bestaudio/best/best',
-                'outtmpl': os.path.join(temp_dir, '%(title)s.%(ext)s'),
                 'merge_output_format': 'mp4',
-            }
+            })
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(video_url, download=True)
